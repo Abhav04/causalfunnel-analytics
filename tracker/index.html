@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CausalFunnel Analytics Test Page</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1e1e2f, #252545);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 20px;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 20px;
+      font-size: 2rem;
+      background: linear-gradient(90deg, #4facfe, #00f2fe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    p {
+      color: #ccc;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    button, a.btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-primary {
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      color: white;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 114, 255, 0.4);
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    .console-box {
+      margin-top: 30px;
+      background: #0f0f1a;
+      border-radius: 8px;
+      padding: 15px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      text-align: left;
+      max-height: 150px;
+      overflow-y: auto;
+      border: 1px solid #333;
+      color: #4af626;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>CausalFunnel Tracker Demo</h1>
+    <p>Open the browser console (F12) to see outbound analytics requests in the Network tab.</p>
+    
+    <div class="button-group">
+      <!-- Standard auto-tracked button -->
+      <button class="btn-primary" id="signup-btn">
+        Register Account
+      </button>
+
+      <!-- Decorated auto-tracked button -->
+      <button class="btn-secondary" id="custom-action-btn" data-cf-event="newsletter_subscribed" data-cf-prop-plan="premium">
+        Subscribe to Newsletter
+      </button>
+
+      <!-- Standard auto-tracked anchor link -->
+      <a href="#about" class="btn btn-secondary" id="docs-link">
+        Read Documentation
+      </a>
+
+      <!-- Button calling custom js tracking calls -->
+      <button class="btn-primary" style="background: linear-gradient(90deg, #f093fb, #f5576c);" onclick="triggerCustomEvents()">
+        Run Custom JS Events
+      </button>
+    </div>
+
+    <div class="console-box" id="console">
+      Console logs:
+      <div>&gt; Tracker initialized. Pageview sent automatically.</div>
+    </div>
+  </div>
+
+  <!-- Include tracker.js -->
+  <script src="tracker.js"></script>
+  
+  <script>
+    const logBox = document.getElementById('console');
+    function logToScreen(msg) {
+      const div = document.createElement('div');
+      div.textContent = `> ${msg}`;
+      logBox.appendChild(div);
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    function triggerCustomEvents() {
+      logToScreen('Identifying user as "user_jane_doe"...');
+      causalfunnel.identify('user_jane_doe');
+      
+      logToScreen('Tracking custom event: "add_to_cart"...');
+      causalfunnel.track('add_to_cart', {
+        productId: 'prod_98765',
+        price: 29.99,
+        category: 'electronics'
+      });
+      
+      logToScreen('Tracking custom event: "checkout_complete"...');
+      causalfunnel.track('checkout_complete', {
+        orderValue: 29.99,
+        paymentMethod: 'credit_card'
+      });
+    }
+
+    // Capture standard clicks to log to screen as well
+    document.getElementById('signup-btn').addEventListener('click', () => {
+      logToScreen('Clicked "Register Account". Triggered auto-button click tracking.');
+    });
+    
+    document.getElementById('custom-action-btn').addEventListener('click', () => {
+      logToScreen('Clicked "Subscribe". Triggered custom auto-click "newsletter_subscribed" with custom property plan="premium".');
+    });
+
+    document.getElementById('docs-link').addEventListener('click', () => {
+      logToScreen('Clicked "Read Documentation". Triggered auto-link click tracking.');
+    });
+  </script>
+</body>
+</html>
