@@ -1,0 +1,7 @@
+.DS_Store
+*.log
+clear-events.js
+test-client.js
+node_modules/
+.env
+.env.local

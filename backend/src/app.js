@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const eventRoutes = require('./routes/eventRoutes');
+const sessionRoutes = require('./routes/sessionRoutes');
+const heatmapRoutes = require('./routes/heatmapRoutes');
 
 const app = express();
 
@@ -19,6 +21,8 @@ if (process.env.NODE_ENV === 'development') {
 
 // Routes
 app.use('/api/events', eventRoutes);
+app.use('/api/sessions', sessionRoutes);
+app.use('/api/heatmap', heatmapRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

@@ -1,44 +1,34 @@
 const mongoose = require('mongoose');
 
 const eventSchema = new mongoose.Schema({
-  eventType: {
+  session_id: {
     type: String,
     required: true,
-    index: true
+    index: true,
   },
-  eventName: {
-    type: String,
-    index: true
-  },
-  sessionId: {
+  event_type: {
     type: String,
     required: true,
-    index: true
+    enum: ['page_view', 'click'],
   },
-  userId: {
+  page_url: {
     type: String,
-    index: true
-  },
-  url: {
-    type: String,
-    required: true
-  },
-  referrer: {
-    type: String
-  },
-  userAgent: {
-    type: String,
-    required: true
-  },
-  properties: {
-    type: mongoose.Schema.Types.Mixed,
-    default: {}
+    required: true,
   },
   timestamp: {
     type: Date,
-    default: Date.now,
-    index: true
-  }
+    required: true,
+  },
+  x: {
+    type: Number,
+  },
+  y: {
+    type: Number,
+  },
+}, {
+  timestamps: { createdAt: 'received_at', updatedAt: false },
 });
+
+eventSchema.index({ page_url: 1, event_type: 1 });
 
 module.exports = mongoose.model('Event', eventSchema);
