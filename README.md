@@ -2,6 +2,13 @@
 
 A lightweight, self-contained web analytics and session tracking platform. This project captures user interactions (page views and button/link clicks) on any webpage, aggregates them into sessions, and visualizes them on a dashboard featuring user journey timelines and page click heatmaps.
 
+## 🔗 Live Deployments
+
+* **Frontend Dashboard (Vercel):** `[Vercel Production URL]`
+* **Backend API (Render):** `https://causalfunnel-analytics-ib1b.onrender.com`
+* **Static Sandbox Demo:** `https://causalfunnel-analytics-ib1b.onrender.com/demo.html`
+* **Telemetry Script:** `https://causalfunnel-analytics-ib1b.onrender.com/tracker.js`
+
 ---
 
 ## 🛠 Technology Stack
@@ -74,6 +81,8 @@ A lightweight, self-contained web analytics and session tracking platform. This 
    npx serve . -p 5500
    ```
 3. Visit [http://localhost:5500/demo.html](http://localhost:5500/demo.html) in your browser and click on buttons/links to generate tracking data.
+
+*Alternatively, you can visit the publicly hosted demo sandbox directly on Render at: [https://causalfunnel-analytics-ib1b.onrender.com/demo.html](https://causalfunnel-analytics-ib1b.onrender.com/demo.html)*
 
 ---
 
