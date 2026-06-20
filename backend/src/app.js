@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const path = require('path');
 const eventRoutes = require('./routes/eventRoutes');
 const sessionRoutes = require('./routes/sessionRoutes');
 const heatmapRoutes = require('./routes/heatmapRoutes');
@@ -11,6 +12,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static tracker files
+app.use(express.static(path.join(__dirname, '../../tracker')));
 
 // HTTP request logger
 if (process.env.NODE_ENV === 'development') {

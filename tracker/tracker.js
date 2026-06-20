@@ -1,5 +1,5 @@
 (function () {
-  const API_URL = 'http://localhost:5001/api/events';
+  const API_URL = '/api/events';
 
   function getSessionId() {
     let sessionId = localStorage.getItem('session_id');
