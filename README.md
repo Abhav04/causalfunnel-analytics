@@ -1,95 +1,141 @@
 # CausalFunnel Analytics
 
-A lightweight, self-contained web analytics and session tracking platform. This project captures user interactions (page views and button/link clicks) on any webpage, aggregates them into sessions, and visualizes them on a dashboard featuring user journey timelines and page click heatmaps.
+A simple full-stack user analytics application: a lightweight tracking script
+captures `page_view` and `click` events on a webpage, an Express API stores
+them in MongoDB, and a Next.js dashboard displays session journeys and a
+click heatmap.
 
-## 🔗 Live Deployments
+## Live demo
 
-* **Frontend Dashboard (Vercel):** `[Vercel Production URL]`
-* **Backend API (Render):** `https://causalfunnel-analytics-ib1b.onrender.com`
-* **Static Sandbox Demo:** `https://causalfunnel-analytics-ib1b.onrender.com/demo.html`
-* **Telemetry Script:** `https://causalfunnel-analytics-ib1b.onrender.com/tracker.js`
+- **Dashboard:** https://causalfunnel-analytics-qwkz70ufg.vercel.app/
+- **API:** https://causalfunnel-analytics-ib1b.onrender.com
+- **Tracker demo page:** https://causalfunnel-analytics-ib1b.onrender.com/demo.html#
 
----
+> Visit the demo page above and click around, then check the dashboard —
+> the tracker is live and will record your session in real time.
 
-## 🛠 Technology Stack
+> **Note:** the backend is hosted on Render's free tier, which spins down
+> after inactivity. The first request after idle time may take 30–60
+> seconds to respond while the server wakes up.
 
-### 1. Tracker (`tracker/`)
-* **Vanilla JavaScript:** Embedded on the client site with zero dependencies, wrapped inside an IIFE (Immediately Invoked Function Expression) to protect the host global namespace.
-* **Telemetry API:** Utilizes standard browser APIs (`fetch` with keep-alive, viewport sizing, and event listener hooks).
+## Tech stack
 
-### 2. Backend (`backend/`)
-* **Node.js & Express:** Lightweight routing framework.
-* **Mongoose & MongoDB Atlas:** Remote document-based storage for events data, using basic indexing and compound keys.
+| Layer | Technology |
+|---|---|
+| Tracking script | Vanilla JavaScript (no dependencies, no build step) |
+| Backend | Node.js, Express |
+| Database | MongoDB Atlas, accessed via Mongoose |
+| Frontend | Next.js (App Router), React, Tailwind CSS |
+| Hosting | Render (backend + tracker), Vercel (frontend) |
 
-### 3. Frontend Dashboard (`frontend/`)
-* **Next.js (App Router):** Modern React framework utilising **Server Components** for fast, server-rendered session summaries, and **Client Components** for interactive components (timelines and canvas plotting).
-* **Tailwind CSS:** Responsive, utility-first styling.
+## Project structure
 
----
+```
+causalfunnel-analytics/
+├── backend/      Express API + Mongoose models
+├── frontend/     Next.js dashboard
+└── tracker/      Vanilla JS tracking script + demo page
+```
 
-## 🚀 Setup & Execution
+## Setup — running locally
 
 ### Prerequisites
-* Ensure **Node.js (v18+)** is installed.
-* Retrieve a MongoDB Atlas Connection URI.
+- Node.js (LTS)
+- A MongoDB Atlas account (free tier is sufficient), or a local MongoDB instance
 
-### 1. Backend Server Setup
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Create a configuration file `backend/.env` containing:
-   ```env
-   PORT=5001
-   MONGODB_URI=your_mongodb_atlas_connection_uri
-   ```
-4. Start the server in development mode:
-   ```bash
-   npm run dev
-   ```
+### 1. Backend
 
-### 2. Next.js Dashboard Setup
-1. Navigate to the frontend directory:
-   ```bash
-   cd ../frontend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Create a local environment file `frontend/.env.local` containing:
-   ```env
-   NEXT_PUBLIC_API_URL=http://localhost:5001/api
-   ```
-4. Run the frontend server:
-   ```bash
-   npm run dev
-   ```
-5. View the dashboard at [http://localhost:3000](http://localhost:3000).
+```bash
+cd backend
+npm install
+```
 
-### 3. Static Tracker Server (Demo)
-1. Navigate to the tracker directory:
-   ```bash
-   cd ../tracker
-   ```
-2. Run the static file server to serve the tracker sandbox:
-   ```bash
-   npx serve . -p 5500
-   ```
-3. Visit [http://localhost:5500/demo.html](http://localhost:5500/demo.html) in your browser and click on buttons/links to generate tracking data.
+Create a `.env` file in `backend/`:
 
-*Alternatively, you can visit the publicly hosted demo sandbox directly on Render at: [https://causalfunnel-analytics-ib1b.onrender.com/demo.html](https://causalfunnel-analytics-ib1b.onrender.com/demo.html)*
+```
+PORT=5000
+MONGODB_URI=your-mongodb-atlas-connection-string/causalfunnel?retryWrites=true&w=majority
+```
 
----
+```bash
+npm run dev
+```
 
-## 🧠 Design Decisions & Trade-offs
+The API will be available at `http://localhost:5000`.
 
-* **CORS Port Adjustments (Mac Specific):** The backend default port was moved from `5000` to `5001`. On macOS, system-level processes (`ControlCenter`/AirPlay Receiver) bind to port 5000 by default, which blocks Node applications. Moving to port `5001` resolved this conflict seamlessly.
-* **URL Normalization in Tracker:** To prevent a single page's analytics from fragmenting into multiple buckets (e.g. `demo.html`, `demo.html#`, and `demo.html?ref=email` appearing as separate pages), the tracker sanitizes the URL via `window.location.origin + window.location.pathname` before posting events. This groups scroll fragment clicks together under a unified path.
-* **Deterministic Locale Date-times:** To solve React hydration warnings where dates rendered on the Node server (e.g., US locale) did not match the client's locale format, we explicitly pinned the locale configuration in `toLocaleString()` calls to `'en-GB'`.
-* **Fail-Safe Client Ingestion:** The tracker script wraps network requests in a `.catch()` block to log failures without throwing unhandled exceptions. In an analytics setting, a failed tracking call should never interfere with or crash the host website's primary features (e.g., a checkout flow).
-* **Simplified Heatmap Plotting:** The heatmap overlay is plotted on a relative-positioned gray box canvas directly mapping the `x` and `y` coordinate pairs, rather than embedding complex viewport tracking iframes.
+### 2. Frontend
+
+```bash
+cd frontend
+npm install
+```
+
+Create a `.env.local` file in `frontend/`:
+
+```
+NEXT_PUBLIC_API_URL=http://localhost:5000/api
+```
+
+```bash
+npm run dev
+```
+
+The dashboard will be available at `http://localhost:3000`.
+
+### 3. Tracker demo page
+
+```bash
+cd tracker
+npx serve . -p 5500
+```
+
+Visit `http://localhost:5500/demo.html`, click around, and refresh the
+dashboard to see the session appear.
+
+## API endpoints
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `POST` | `/api/events` | Ingest a single event |
+| `GET` | `/api/sessions` | List all sessions with event counts |
+| `GET` | `/api/sessions/:sessionId/events` | Ordered event timeline for one session |
+| `GET` | `/api/heatmap?page_url=...` | Click coordinates for a given page |
+| `GET` | `/api/events/pages` | Distinct page URLs (used to populate the heatmap dropdown) |
+
+## Assumptions and trade-offs
+
+- **Session identity persists indefinitely.** The session ID is stored in
+  `localStorage`, not a cookie with an expiry, so it persists across visits
+  on the same browser rather than expiring after inactivity. This makes it
+  closer to a long-lived visitor ID than a true time-boxed "session," which
+  was a deliberate simplification for this assignment's scope.
+- **Page identity ignores hash fragments and query strings.** The tracker
+  normalizes `page_url` to origin + pathname, so `/demo.html`,
+  `/demo.html#`, and `/demo.html?ref=x` are all treated as the same page.
+  This keeps heatmap data from fragmenting across what a user would
+  consider one page.
+- **`x`/`y` are not conditionally required.** The schema allows them to be
+  optional rather than enforcing "required if `event_type` is `click`."
+  This was a conscious scope cut — a custom Mongoose validator could add
+  this, but isn't necessary for the assignment's requirements.
+- **CORS is fully open** (`cors()` with no origin restriction) on the
+  deployed API. Fine for a demo; a production system would restrict this
+  to the dashboard's actual domain.
+- **The heatmap renders raw coordinates on an empty box**, not an actual
+  screenshot or live render of the tracked page. The assignment explicitly
+  allows "dots or simple grid," so this was kept intentionally simple.
+- **No custom error boundary** for the dashboard's server-rendered pages —
+  if the API is unreachable, Next.js's default error handling is used
+  rather than a custom-designed fallback UI.
+- **Render's free tier cold-starts.** The backend may take up to a minute
+  to respond after a period of inactivity; this is a hosting trade-off,
+  not an application bug.
+
+## Possible future improvements
+
+- Conditional schema validation for click coordinates
+- A real screenshot/iframe rendering under the heatmap dots, scaled to
+  viewport size
+- Session expiry (true session semantics rather than persistent visitor ID)
+- Restricted CORS origin in production
+- Custom error and loading states throughout the dashboard
